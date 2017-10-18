@@ -1,0 +1,103 @@
+<html>
+<head>
+  <script src="js/components/game.js"></script>
+  <script src="js/components/brick.js"></script>
+  <script src="js/components/tile.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    @keyframes new {
+      from {
+          opacity:0;
+      }
+      to {
+          opacity:1;
+      }
+  }
+    .game-wrapper {
+      border: 1px solid #666;
+      display: inline-block;
+    }
+    x-game {
+      height: 400px;
+      width: 400px;
+      display: block;
+      box-sizing: content-box;
+      position: relative;
+    }
+
+    x-tile {
+      
+      }
+    x-brick, x-tile {
+      border: 1px solid #666;
+      
+      display: inline-block;
+      box-sizing: border-box;
+      position: absolute;
+    }
+    x-brick {
+      text-align: center;
+      transition:0.2s;
+    -webkit-transition:0.2s;
+    -moz-transition:0.2s;
+    background-color: black;
+    
+    }
+    x-brick * {
+      margin: 0;
+    }
+    x-brick[new="true"] {
+      border: 1px solid red;
+      animation: new 0.2s;
+      
+    }
+    x-brick[merged="true"] {
+      border-width: 4px;
+      
+    }
+    x-brick[value="2"] {
+      background-color: lightgray;
+    }
+    x-brick[value="4"] {
+      background-color: gray;
+    }
+    x-brick[value="8"] {
+      background-color: lightyellow;
+    }
+    x-brick[value="16"] {
+      background-color: yellow;
+    }
+    x-brick[value="32"] {
+      background-color: yellowgreen;
+    }
+    x-brick[value="64"] {
+      background-color: green;
+    }
+    x-brick[value="128"] {
+      background-color: lightcoral;
+    }
+    x-brick[value="256"] {
+      background-color: red;
+    }
+    x-brick[value="512"] {
+      background-color: plum;
+    }
+    x-brick[value="1024"] {
+      background-color: purple;
+    }
+    x-brick[value="2048"] {
+      background-color: blue;
+    }
+    x-brick[markedForDestruction="true"] {
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+  <x-game></x-game>
+  </div>
+</body>
+</html>
