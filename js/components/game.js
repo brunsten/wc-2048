@@ -41,8 +41,7 @@ class Game extends HTMLElement {
 
       return tile;
     });
-    tiles.slice(0, tiles.length - 1).forEach((tile, i) => this.putBrick(tile, i));
-    //this.putRandomBrick();
+    this.putRandomBrick();
   }
 
   putRandomBrick() {
