@@ -1,13 +1,27 @@
 class Game extends HTMLElement {
   get size() {
-    return this.getAttribute('size');
+    return parseInt(this.getAttribute('size'));
   }
 
   set size(value) {
     this.setAttribute('size', value)
   }
 
+  get points() {
+    return parseInt(this.getAttribute('points'));
+  }
+
+  set points(value) {
+    this.setAttribute('points', value)
+  }
+  attributeChangedCallback(attr, oldValue, newValue) {
+    if (attr === 'points') {
+      this.pointsDisplay.innerText = this.points;
+    }
+  }
+
   connectedCallback() {
+    this.states = [];
     let lastEventStamp = 0;
     document.addEventListener('keydown', (event) => {
       if (event.timeStamp - lastEventStamp < 200) {
@@ -29,7 +43,25 @@ class Game extends HTMLElement {
           break;
       }
     });
-    this.size = 3;
+    const gamePanel = document.createElement('div');
+    gamePanel.classList.add('game-panel');
+    const pointsWrapper = document.createElement('h2');
+    const pointsLabel = document.createElement('span');
+    pointsLabel.innerText = 'Score: ';
+    this.pointsDisplay = document.createElement('span');
+    pointsWrapper.appendChild(pointsLabel);
+    pointsWrapper.appendChild(this.pointsDisplay);
+    gamePanel.appendChild(pointsWrapper);
+    this.points = 0;
+    this.undoButton = document.createElement('button');
+    this.undoButton.innerText = 'Undo';
+    this.undoButton.disabled = false;
+    
+    gamePanel.appendChild(this.undoButton);
+    this.appendChild(gamePanel);
+    this.undoButton.addEventListener('click', (event) => {
+      this.undo();
+    });
     this.tileSize = this.offsetWidth / this.size;
     const numberOfTiles = this.size * this.size;
     const tiles = new Array(numberOfTiles).fill(null).map((_, index) => {
@@ -94,6 +126,7 @@ class Game extends HTMLElement {
   }
 
   moveBricks(key, toTopOrLeft) {
+    this.setState();
     const groupKey = key === 'row' ? 'column' : 'row';
     const brickGroups = this.groupBricks(groupKey, key, !toTopOrLeft);
     brickGroups.forEach((group) => {
@@ -118,7 +151,7 @@ class Game extends HTMLElement {
     if (dirtyBricks.length) {
       dirtyBricks.forEach((brick) => brick.dirty = false);
       this.putRandomBrick();
-      if(!this.canMove()) {
+      if (!this.canMove()) {
         this.innerHTML = `
         <iframe width="560" height="315" src="https://www.youtube.com/embed/u2ycDWywGls?rel=0&amp;controls=0&amp;showinfo=0&amp;autoplay=1" frameborder="0" allowfullscreen></iframe>
         `;
@@ -133,20 +166,19 @@ class Game extends HTMLElement {
     }
     let canMatch = false;
     const bricksPerColumns = this.groupBricks('column', 'row', false);
-    const bricksPerRows = this.groupBricks('row', 'columns', false);
+    const bricksPerRows = this.groupBricks('row', 'column', false);
     const checkIfNextIsMatch = (brick, index, collection) => {
-      if(canMatch) {
+      if (canMatch) {
         return;
       }
-      const next = bricksPerColumns[index + 1];
-      if( next && next.value === brick.value ) {
-        debugger;
+      const next = collection[index + 1];
+      if (next && next.value === brick.value) {
         canMatch = true;
       }
     };
 
     bricksPerColumns.forEach((column) => column.forEach(checkIfNextIsMatch));
-    bricksPerRows.forEach((row) => row.forEach(checkIfNextIsMatch))
+    bricksPerRows.forEach((row) => row.forEach(checkIfNextIsMatch));
     return canMatch;
   }
 
@@ -164,6 +196,32 @@ class Game extends HTMLElement {
     }
     return brickGroups;
   }
-}
 
-customElements.define('x-game', Game);
+  setState() {
+    const state = {
+      bricks: Array.from(this.querySelectorAll('x-brick')).map((brick) => brick.cloneNode()),
+      points: this.points,
+    }
+
+    this.states.push(state);
+    this.undoButton.disabled = false;
+    
+
+  }
+
+  undo() {
+    if (this.states.length > 0) {
+      this.querySelectorAll('x-brick').forEach((brick) => brick.remove());
+      const state = this.states.pop();
+      state.bricks.forEach((brick) => this.appendChild(brick));
+      this.points = state.points;
+      if (this.states.length === 0) {
+        this.undoButton.disabled = true;
+      }
+    }
+  }
+}
+  Game.observedAttributes = [
+    'points',
+  ];
+  customElements.define('x-game', Game);

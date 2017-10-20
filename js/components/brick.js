@@ -105,6 +105,7 @@ class Brick extends HTMLElement {
   merge() {
     this.merged = true;
     this.value *= 2;
+    this.parentElement.points += this.value;
     setTimeout(() => this.merged = false, 100);    
   }
 

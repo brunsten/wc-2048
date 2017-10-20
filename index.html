@@ -27,9 +27,22 @@
       position: relative;
     }
 
-    x-tile {
-      
-      }
+    x-game .game-panel {
+      margin: 0;
+      bottom: -50px;
+      position: absolute;
+      width: 100%;
+    }
+    x-game .game-panel h2 {
+      margin: 0;
+     
+    }
+
+    x-game .game-panel button {
+      float:right;  
+     
+    }
+
     x-brick, x-tile {
       border: 1px solid #666;
       
@@ -97,7 +110,7 @@
 </head>
 <body>
   <div class="game-wrapper">
-  <x-game></x-game>
+  <x-game size=4></x-game>
   </div>
 </body>
 </html>
